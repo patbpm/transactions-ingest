@@ -1,0 +1,26 @@
+[
+  {
+    "transactionId": 100001,
+    "cardNumber": "***4444",
+    "locationCode": "ONLINE",
+    "productName": "USB-C Docking Station",
+    "amount": 129.95,
+    "minutesAgo": 120
+  },
+  {
+    "transactionId": 100002,
+    "cardNumber": "***5555",
+    "locationCode": "ONLINE",
+    "productName": "Laptop Stand",
+    "amount": 45.00,
+    "minutesAgo": 50
+  },
+  {
+    "transactionId": 100003,
+    "cardNumber": "***6666",
+    "locationCode": "ONLINE",
+    "productName": "Webcam 1080p",
+    "amount": 59.99,
+    "minutesAgo": 10
+  }
+]

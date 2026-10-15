@@ -1,0 +1,18 @@
+[
+  {
+    "transactionId": 100001,
+    "cardNumber": "***0002",
+    "locationCode": "DOWNTOWN",
+    "productName": "Mechanical Keyboard",
+    "amount": 89.99,
+    "minutesAgo": 150
+  },
+  {
+    "transactionId": 100002,
+    "cardNumber": "***3333",
+    "locationCode": "DOWNTOWN",
+    "productName": "Desk Lamp",
+    "amount": 34.75,
+    "minutesAgo": 70
+  }
+]

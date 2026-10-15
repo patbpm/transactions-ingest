@@ -1,0 +1,26 @@
+[
+  {
+    "transactionId": 100001,
+    "cardNumber": "***1111",
+    "locationCode": "UPTOWN",
+    "productName": "Wireless Mouse",
+    "amount": 24.99,
+    "minutesAgo": 180
+  },
+  {
+    "transactionId": 100002,
+    "cardNumber": "***2222",
+    "locationCode": "UPTOWN",
+    "productName": "USB-C Cable",
+    "amount": 12.50,
+    "minutesAgo": 95
+  },
+  {
+    "transactionId": 100003,
+    "cardNumber": "",
+    "locationCode": "UPTOWN",
+    "productName": "Gift Card $50",
+    "amount": 50.00,
+    "minutesAgo": 30
+  }
+]
