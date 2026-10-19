@@ -42,3 +42,24 @@ th {
 .status-active { color: #1a7f37; font-weight: 600; }
 .status-revoked { color: #b00020; font-weight: 600; }
 .status-finalized { color: #555; font-weight: 600; }
+
+button.link {
+  padding: 2px 8px;
+  background: none;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+.history-row > td {
+  background: #fafafa;
+  padding-left: 32px;
+}
+
+.history-table th {
+  background: #eee;
+  font-size: 0.85em;
+}
+
+.history-table td {
+  font-size: 0.9em;
+}

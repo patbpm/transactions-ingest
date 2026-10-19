@@ -1,22 +1,22 @@
 <div class="toolbar">
-  <button (click)="runImport()" [disabled]="importing">
-    {{ importing ? 'Importing...' : 'Run Import' }}
+  <button (click)="runImport()" [disabled]="importing()">
+    {{ importing() ? 'Importing...' : 'Run Import' }}
   </button>
-  <button (click)="loadTransactions()" [disabled]="loading">Refresh</button>
+  <button (click)="loadTransactions()" [disabled]="loading()">Refresh</button>
 
-  <span *ngIf="lastImportResult" class="import-summary">
-    Last import: {{ lastImportResult.newCount }} new,
-    {{ lastImportResult.updatedCount }} updated,
-    {{ lastImportResult.revokedCount }} revoked,
-    {{ lastImportResult.finalizedCount }} finalized,
-    {{ lastImportResult.unchangedCount }} unchanged
+  <span *ngIf="lastImportResult() as r" class="import-summary">
+    Last import: {{ r.newCount }} new,
+    {{ r.updatedCount }} updated,
+    {{ r.revokedCount }} revoked,
+    {{ r.finalizedCount }} finalized,
+    {{ r.unchangedCount }} unchanged
   </span>
 </div>
 
-<p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-<p *ngIf="loading">Loading...</p>
+<p *ngIf="errorMessage()" class="error">{{ errorMessage() }}</p>
+<p *ngIf="loading()">Loading...</p>
 
-<table *ngIf="!loading && transactions.length > 0">
+<table *ngIf="!loading() && transactions().length > 0">
   <thead>
     <tr>
       <th>Source System</th>
@@ -26,21 +26,60 @@
       <th>Amount</th>
       <th>Transaction Time</th>
       <th>Status</th>
+      <th>History</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let t of transactions">
-      <td>{{ t.sourceSystem }}</td>
-      <td>{{ t.transactionId }}</td>
-      <td>{{ t.locationCode }}</td>
-      <td>{{ t.productName }}</td>
-      <td>{{ t.amount | number: '1.2-2' }}</td>
-      <td>{{ t.transactionTime | date: 'short' }}</td>
-      <td><span [class]="statusClass(t.status)">{{ t.status }}</span></td>
-    </tr>
+    <ng-container *ngFor="let t of transactions()">
+      <tr>
+        <td>{{ t.sourceSystem }}</td>
+        <td>{{ t.transactionId }}</td>
+        <td>{{ t.locationCode }}</td>
+        <td>{{ t.productName }}</td>
+        <td>{{ t.amount | number: '1.2-2' }}</td>
+        <td>{{ t.transactionTime | date: 'short' }}</td>
+        <td><span [class]="statusClass(t.status)">{{ t.status }}</span></td>
+        <td>
+          <button class="link" (click)="toggleHistory(t)">
+            {{ expandedId() === t.id ? 'Hide' : 'View' }}
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="expandedId() === t.id" class="history-row">
+        <td colspan="8">
+          <p *ngIf="auditLoading()">Loading history...</p>
+          <p *ngIf="auditError()" class="error">{{ auditError() }}</p>
+          <table *ngIf="!auditLoading() && !auditError() && auditEntries().length > 0" class="history-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Change</th>
+                <th>Field</th>
+                <th>Old value</th>
+                <th>New value</th>
+                <th>Import batch</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of auditEntries()">
+                <td>{{ a.changedAtUtc | date: 'medium' }}</td>
+                <td>{{ a.changeType }}</td>
+                <td>{{ a.fieldName || '-' }}</td>
+                <td>{{ a.oldValue ?? '-' }}</td>
+                <td>{{ a.newValue ?? '-' }}</td>
+                <td>{{ a.importBatchId }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p *ngIf="!auditLoading() && !auditError() && auditEntries().length === 0">
+            No history recorded.
+          </p>
+        </td>
+      </tr>
+    </ng-container>
   </tbody>
 </table>
 
-<p *ngIf="!loading && transactions.length === 0 && !errorMessage">
+<p *ngIf="!loading() && transactions().length === 0 && !errorMessage()">
   No transactions yet. Click "Run Import" to pull from the mock source systems.
 </p>
