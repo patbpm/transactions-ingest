@@ -115,3 +115,7 @@ Run from the repo root (or from `TransactionsIngest.Tests`).
   happen in the browser, so with a large dataset they would need to move to the API with paging.
 - There is no concurrency guard, so two imports started at the same moment are not prevented from
   overlapping. A production job would add one.
+
+## AI usage
+
+See [AI_USAGE.md](AI_USAGE.md)
