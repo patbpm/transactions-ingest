@@ -1,5 +1,9 @@
 # AI Usage Disclosure
 
+Supporting documents:
+- [Prompts, instructions and conventions](docs/ai/PROMPTS_AND_INSTRUCTIONS.md)
+- [Design discussion](docs/ai/DESIGN_DISCUSSION.md)
+
 AI tools were used as development assistants during this exercise. I used Claude via Claude Code to support implementation, explore design alternatives, troubleshoot issues, and improve test coverage and documentation.
 
 My approach was iterative: I worked through the requirements in stages, reviewed implementation options, ran the application locally, and used the results to guide further changes. The focus was on producing a working solution with clear business rules, testable components, and documented design decisions.
