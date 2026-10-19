@@ -1,7 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionsService } from '../core/transactions.service';
 import { AuditEntry, ImportResult, Transaction } from '../core/transaction.model';
+
+type StatusFilter = 'All' | 'Active' | 'Revoked' | 'Finalized';
 
 // State is held in signals because the app runs without zone.js (the Angular default now), so
 // plain fields updated inside HTTP callbacks would not trigger a re-render.
@@ -24,6 +26,37 @@ export class TransactionsTableComponent implements OnInit {
   auditLoading = signal(false);
   auditError = signal<string | null>(null);
   auditEntries = signal<AuditEntry[]>([]);
+
+  // Filter and sort state. The visible list is derived from these and the loaded data.
+  searchText = signal('');
+  statusFilter = signal<StatusFilter>('All');
+  sourceFilter = signal('All');
+  sortKey = signal<keyof Transaction>('transactionTime');
+  sortDir = signal<'asc' | 'desc'>('desc');
+
+  sources = computed(() =>
+    [...new Set(this.transactions().map(t => t.sourceSystem))].sort());
+
+  visibleTransactions = computed(() => {
+    const text = this.searchText().trim().toLowerCase();
+    const status = this.statusFilter();
+    const source = this.sourceFilter();
+    const key = this.sortKey();
+    const dir = this.sortDir() === 'asc' ? 1 : -1;
+
+    return this.transactions()
+      .filter(t =>
+        (status === 'All' || t.status === status) &&
+        (source === 'All' || t.sourceSystem === source) &&
+        (text === '' ||
+          t.productName.toLowerCase().includes(text) ||
+          String(t.transactionId).includes(text)))
+      .sort((a, b) => {
+        const x = a[key];
+        const y = b[key];
+        return x < y ? -dir : x > y ? dir : 0;
+      });
+  });
 
   constructor(private transactionsService: TransactionsService) {}
 
@@ -88,6 +121,32 @@ export class TransactionsTableComponent implements OnInit {
         this.auditLoading.set(false);
       }
     });
+  }
+
+  onSearch(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
+
+  onStatusChange(event: Event): void {
+    this.statusFilter.set((event.target as HTMLSelectElement).value as StatusFilter);
+  }
+
+  onSourceChange(event: Event): void {
+    this.sourceFilter.set((event.target as HTMLSelectElement).value);
+  }
+
+  sortBy(key: keyof Transaction): void {
+    if (this.sortKey() === key) {
+      this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortKey.set(key);
+      this.sortDir.set('asc');
+    }
+  }
+
+  sortIndicator(key: keyof Transaction): string {
+    if (this.sortKey() !== key) return '';
+    return this.sortDir() === 'asc' ? ' ▲' : ' ▼';
   }
 
   statusClass(status: string): string {

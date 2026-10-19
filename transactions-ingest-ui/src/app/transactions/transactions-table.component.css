@@ -63,3 +63,25 @@ button.link {
 .history-table td {
   font-size: 0.9em;
 }
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.filters input,
+.filters select {
+  padding: 6px 8px;
+}
+
+.count {
+  color: #555;
+  font-size: 0.9em;
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}

@@ -13,24 +13,42 @@
   </span>
 </div>
 
+<div class="filters">
+  <input type="search" placeholder="Search product or ID" [value]="searchText()" (input)="onSearch($event)" />
+
+  <select [value]="statusFilter()" (change)="onStatusChange($event)">
+    <option value="All">All statuses</option>
+    <option value="Active">Active</option>
+    <option value="Revoked">Revoked</option>
+    <option value="Finalized">Finalized</option>
+  </select>
+
+  <select [value]="sourceFilter()" (change)="onSourceChange($event)">
+    <option value="All">All sources</option>
+    <option *ngFor="let s of sources()" [value]="s">{{ s }}</option>
+  </select>
+
+  <span class="count">{{ visibleTransactions().length }} of {{ transactions().length }}</span>
+</div>
+
 <p *ngIf="errorMessage()" class="error">{{ errorMessage() }}</p>
 <p *ngIf="loading()">Loading...</p>
 
 <table *ngIf="!loading() && transactions().length > 0">
   <thead>
     <tr>
-      <th>Source System</th>
-      <th>Transaction ID</th>
-      <th>Location Code</th>
-      <th>Product Name</th>
-      <th>Amount</th>
-      <th>Transaction Time</th>
-      <th>Status</th>
+      <th class="sortable" (click)="sortBy('sourceSystem')">Source System{{ sortIndicator('sourceSystem') }}</th>
+      <th class="sortable" (click)="sortBy('transactionId')">Transaction ID{{ sortIndicator('transactionId') }}</th>
+      <th class="sortable" (click)="sortBy('locationCode')">Location Code{{ sortIndicator('locationCode') }}</th>
+      <th class="sortable" (click)="sortBy('productName')">Product Name{{ sortIndicator('productName') }}</th>
+      <th class="sortable" (click)="sortBy('amount')">Amount{{ sortIndicator('amount') }}</th>
+      <th class="sortable" (click)="sortBy('transactionTime')">Transaction Time{{ sortIndicator('transactionTime') }}</th>
+      <th class="sortable" (click)="sortBy('status')">Status{{ sortIndicator('status') }}</th>
       <th>History</th>
     </tr>
   </thead>
   <tbody>
-    <ng-container *ngFor="let t of transactions()">
+    <ng-container *ngFor="let t of visibleTransactions()">
       <tr>
         <td>{{ t.sourceSystem }}</td>
         <td>{{ t.transactionId }}</td>
@@ -79,6 +97,10 @@
     </ng-container>
   </tbody>
 </table>
+
+<p *ngIf="!loading() && transactions().length > 0 && visibleTransactions().length === 0">
+  No transactions match the current filters.
+</p>
 
 <p *ngIf="!loading() && transactions().length === 0 && !errorMessage()">
   No transactions yet. Click "Run Import" to pull from the mock source systems.

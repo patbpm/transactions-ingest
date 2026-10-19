@@ -85,15 +85,33 @@ Run from the repo root (or from `TransactionsIngest.Tests`).
 - **A failing source does not fail the import.** An exception from one source's fetch is logged and
   that source is skipped, so the others are still processed.
 
-## Verification status and known limitations
+  The sample JSON in the exercise uses fixed timestamps, but fixed times would age out of the 24-hour
+  revocation window and never demonstrate revocation, so the mock files use relative times.
+
+## Verification status
 
 - The backend was started and exercised over HTTP: the first import inserted 8 transactions, a
-  second import reported 0 new and 8 unchanged, and Swagger loaded.
-- The 6 xUnit tests pass (insert, update, revoke, finalize, idempotency, cross-source collisions).
-- The Angular app was verified with a production `ng build` only. It was not exercised in a browser
-  against the live API.
-- `npm install` failed on the Google Drive (G:) folder this project was developed in, so the UI
-  build was verified in a copy under a local temp directory. On a normal local disk
-  `npm install` and `ng serve` should work.
-- Restore reports NuGet advisories for the SQLite and Pkcs transitive packages. They did not affect
-  the tests and were not upgraded.
+  second import reported 0 new and 8 unchanged, and Swagger loads.
+- The 7 xUnit tests pass: insert, update, revoke, finalize, idempotency, cross-source collisions,
+  and a regression test for a `DateTime.Kind` bug that only appears across separate `DbContext`
+  instances (SQLite returns `Kind=Unspecified`; the service normalizes it before comparing).
+- The Angular app was built and run against the live API: the table loads, "Run Import" works, and
+  each row has a "View" button that shows its audit history. The table can be sorted by clicking a
+  column header and filtered by search text, status and source system. This is done in the browser
+  on the loaded list.
+
+## Evaluating it
+
+- Quickest check: run the API, open Swagger, call `POST /api/import` twice and compare the counts,
+  then call `GET /api/transactions/{id}/audit` for a row.
+- Import logic lives behind `ITransactionReconciliationService`, so a scheduled job could call it
+  without changes. No scheduler is included, as the exercise specifies.
+
+## Known limitations
+
+- Restore reports NuGet advisories for the SQLite and `System.Security.Cryptography.Pkcs`
+  transitive packages. They did not affect the tests and were not upgraded.
+- `GET /api/transactions` returns everything and there is no pagination. Sorting and filtering
+  happen in the browser, so with a large dataset they would need to move to the API with paging.
+- There is no concurrency guard, so two imports started at the same moment are not prevented from
+  overlapping. A production job would add one.
